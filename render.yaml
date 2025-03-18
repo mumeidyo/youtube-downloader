@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: ytdlp-web
+    env: node
+    plan: free
+    buildCommand: >
+      apt-get update &&
+      apt-get install -y ffmpeg python3 python3-pip &&
+      pip3 install pycryptodomex brotli mutagen websockets &&
+      mkdir -p ./bin &&
+      curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ./bin/yt-dlp &&
+      chmod a+rx ./bin/yt-dlp &&
+      ./bin/yt-dlp --version || echo "Failed to run yt-dlp" &&
+      npm install &&
+      npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+    buildFilter:
+      paths:
+      - bin/**
+      - client/**
+      - server/**
+      - shared/**
